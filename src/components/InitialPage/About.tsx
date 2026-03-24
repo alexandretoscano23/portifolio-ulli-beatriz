@@ -16,7 +16,7 @@ export const About = () => {
                         Nos últimos anos minha trajetória tem se voltado com cada vez mais força para produção de roteiros, vídeos e edição criativa — onde descobri meu estilo e propósito profissional.
                     </p>
                 </div>
-                <img className="imageShadow rounded-lg" width='390px' src="/home/ulliSobre.jpeg" alt="sobre ulli" />
+                <img className="imageShadow rounded-lg" width='360px' src="/home/ulliSobre.jpeg" alt="sobre ulli" />
             </div>
         </section>
     )

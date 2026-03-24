@@ -10,6 +10,8 @@ export default function Home() {
 
     <>
       <main className="flex flex-col px-16 w-full">
+        <br />
+
         <About />
         <Storymaker />
         <Videomaker />
