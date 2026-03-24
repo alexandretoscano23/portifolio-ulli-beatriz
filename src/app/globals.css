@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+@import "tailwindcss";
+
+
+:root {
+    /*Fonts*/
+    --font-titles: "Bebas Neue", sans-serif;
+    --font-links: "Plus Jakarta Sans", sans-serif;
+    --font-citation: "Cormorant Garamond", sans-serif;
+    /*Colors*/
+    --color1: #FFFFFF;
+    --color2: #B0365E;
+    --color3: #8B2346;
+    --color4: #2C2C2C;
+    --color5: #1A1A1A;
+    --color6: #F5F5F0;
+}
+
+h1 {
+    color: #1A1A1A;
+}
+
+h1,
+h2 {
+    letter-spacing: 2px;
+    font-family: var(--font-titles);
+}
+
+a {
+    font-family: var(--font-links);
+    color: var(--color4);
+}
+
+a:hover {
+    color: var(--color5);
+}
+
+body {
+    background: linear-gradient(180deg, #FFFFFF, #F5F5F0);
+    letter-spacing: 1px;
+    color: var(--color4);
+}
+
+.destaque {
+    color: #1A1A1A !important;
+    font-weight: 600;
+}
+
+/*Imagens contato e sobre*/
+.imageShadow {
+    box-shadow: 16px 18px 20px rgba(0, 0, 0, 0.187);
+}
