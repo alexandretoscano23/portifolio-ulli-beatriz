@@ -25,7 +25,7 @@ export const Contact = () => {
                     </div>
 
                 </div>
-                <img className="imageShadow rounded-lg" width='390px' src="/home/ulliContato.jpg" alt="ulli contato" />
+                <img className="imageShadow rounded-lg" width='380px' src="/home/ulliContato.jpg" alt="ulli contato" />
             </div>
         </section>
     )

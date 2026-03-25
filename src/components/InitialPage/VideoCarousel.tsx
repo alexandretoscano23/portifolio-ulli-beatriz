@@ -4,13 +4,15 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { Video } from "@/types/video";
 import Image from "next/image";
 
+
 type Props = {
     items: Video[];
-    title: string;
-    subtitle: string;
+    title?: string;
+    subtitle?: string;
+    onImageClick?: (url: string) => void
 };
 
-export default function MediaCarousel({ items, title, subtitle }: Props) {
+export default function MediaCarousel({ items, title, subtitle, onImageClick }: Props) {
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: "center" });
     const [activeIndex, setActiveIndex] = useState(0);
     const slidesRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -41,7 +43,7 @@ export default function MediaCarousel({ items, title, subtitle }: Props) {
             <div className="flex items-end justify-between mb-1">
                 <div>
                     <h1 className="text-[2.2rem] leading-tight">{title}</h1>
-                    <h3 className="text-sm text-gray-500">{subtitle}</h3>
+                    <h3 className="text-sm text-gray-500 mt-1 mb-3">{subtitle}</h3>
                 </div>
             </div>
 
@@ -62,8 +64,12 @@ export default function MediaCarousel({ items, title, subtitle }: Props) {
                                 <video src={item.src} controls className="w-full h-full object-cover" />
                             )}
                             {item.type === "image" && (
-                                <div className="relative w-full h-full">
-                                    <Image src={item.src} alt={item.name} fill sizes="70vw" className="object-cover" />
+                                <div className="flex flex-col w-full h-full">
+                                    <div className="relative w-full h-full flex flex-col" onClick={() => onImageClick?.(item.src)}>
+                                        <Image src={item.src} alt={item.name} fill sizes="70vw" className="cursor-pointer object-cover" />
+
+                                    </div>
+                                    <p>Clique na imagem para ver mais detalhes</p>
                                 </div>
                             )}
                         </div>
@@ -75,13 +81,13 @@ export default function MediaCarousel({ items, title, subtitle }: Props) {
             <div className="flex gap-2 mt-4">
                 <button
                     onClick={() => emblaApi?.scrollPrev()}
-                    className="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100 text-xl transition"
+                    className="cursor-pointer w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 bg-[#ffff] hover:bg-gray-300 text-xl transition"
                 >
                     ‹
                 </button>
                 <button
                     onClick={() => emblaApi?.scrollNext()}
-                    className="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100 text-xl transition"
+                    className="cursor-pointer w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 bg-[#ffff] hover:bg-gray-300 text-xl transition"
                 >
                     ›
                 </button>
