@@ -19,7 +19,7 @@ export const About = () => {
                     <h3 className="italic destaque subtitle-about" style={{ fontFamily: 'var(--font-citation)' }}>"Entrega rápida é comum. Entrega rápida e bem-feita é diferente. " <span className="text-[.8rem]">- Ulli Beatriz</span></h3>
 
                     <p id="text-about" className="max-w-[550px] leading-7 mt-[1.2rem]">
-                        Meu nome é Ulli Beatriz, tenho 23 anos, sou publicitária formada pela Uniesp e apaixonada por contar histórias que emocionam.
+                        Meu nome é Ulli Beatriz sou publicitária formada pela Uniesp e apaixonada por contar histórias que emocionam.
 
                         Já atuei na Agência Hall7, no setor de mídias da Rede TV Manaíra e atualmente presto serviço para a Produtora Gravo Digital — além de seguir com gestão de perfis para empresas de diferentes nichos.
 
