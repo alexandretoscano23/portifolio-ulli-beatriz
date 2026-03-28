@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "@supabase/supabase-js": "^2.99.3",
     "embla-carousel-fade": "^8.6.0",
     "embla-carousel-react": "^8.6.0",

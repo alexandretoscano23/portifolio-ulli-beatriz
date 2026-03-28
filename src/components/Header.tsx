@@ -1,11 +1,19 @@
 'use client'
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 export const Header = () => {
+
+    const [isMenuClick, setIsMenuClick] = useState(false);
+
+    const handleClick = () => {
+        setIsMenuClick(!isMenuClick); //se clicar vira true e ao clicar de novo vira false (alterna)
+    }
+
     const location = usePathname();
     const isHome = location === '/';
     const navLinks = [
-        ...(isHome ? [] : [{ name: 'Home', href: '/' }]), //caso for falso,joga um array vazio. Se for verdadeiro - joga com array com home e o href
+        ...(isHome ? [] : [{ name: 'Home', href: '/' }]),
         { name: 'Sobre', href: '#sobre' },
         { name: 'Storymaker', href: '#storymaker' },
         { name: 'Videomaker', href: '#videomaker' },
@@ -13,21 +21,38 @@ export const Header = () => {
     ]
     return (
         <>
-            <header className="px-16 py-6">
+            <header className="px-6 md:px-16 mt-[1rem]">
+                {/* Linha 1: título + botão */}
                 <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-3">
-                        <h1 className="uppercase text-[2.2rem]">Ulli Beatriz</h1>
-                        <span className="uppercase text-[1.2rem] font-light text-[#8B2346] tracking-[4px]">Videomaker & Storymaker</span>
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-3">
+                        <h1 className="uppercase text-[2.2rem] title_header">Ulli Beatriz</h1>
+                        <span className="uppercase text-[1.2rem] font-light text-[#8B2346] tracking-[4px] subtitle_header">Videomaker & Storymaker</span>
                     </div>
 
-                    <nav>
-                        <ul className="flex align-center gap-6">
+                    <nav className="hidden md:block">
+                        <ul className="flex items-center gap-6">
                             {navLinks.map((item) => (
-                                <li key={item.href}><a href={item.href} className="relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-[#8B2346] after:transition-all after:duration-300 hover:after:w-full pb-1">{item.name}</a></li>
+                                <li key={item.href}><a href={item.href}>{item.name}</a></li>
                             ))}
                         </ul>
                     </nav>
+
+                    <button className="md:hidden bg-[var(--color3)] text-[1.5rem] px-3 py-2" style={{ background: "#fff", borderRadius: "50%" }} onClick={handleClick}>
+                        {isMenuClick ? "X" : "☰"}
+
+                    </button>
                 </div>
+
+                {/* Linha 2: menu mobile */}
+                {isMenuClick && (
+                    <nav className="md:hidden mt-4" style={{}}>
+                        <ul className="flex flex-col gap-3 px-4 py-2 " style={{ background: "#B0365E", borderRadius: "16px" }}>
+                            {navLinks.map((item) => (
+                                <li key={item.href}><a style={{ color: "var(--color1)" }} href={item.href}>{item.name}</a></li>
+                            ))}
+                        </ul>
+                    </nav>
+                )}
             </header>
         </>
     )
