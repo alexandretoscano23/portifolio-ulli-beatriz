@@ -46,7 +46,7 @@ export default function Home() {
         opacity: 0,
         duration: 1.5,
         ease: "power2.out",
-        // SOLUÇÃO PARA O MODAL: Remove o transform após a animação
+        //Remove o transform após a animação
         onComplete: () => {
           gsap.set(section, { clearProps: "all" });
         }

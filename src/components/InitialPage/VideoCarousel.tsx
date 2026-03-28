@@ -57,19 +57,25 @@ export default function MediaCarousel({ items, title, subtitle, onImageClick }: 
                         <div
                             key={item.id}
                             ref={(el) => { slidesRef.current[index] = el; }}
-                            className="flex-shrink-0 w-[58%] aspect-video rounded-lg overflow-hidden transition-opacity duration-200"
+                            className={`flex-shrink-0 w-[70%] aspect-[3/4] md:w-[45%] md:aspect-video rounded-lg overflow-hidden transition-opacity duration-200 bg-black`}
                             style={{ opacity: index === activeIndex ? 1 : 0.3 }}
                         >
                             {item.type === "video" && (
-                                <video src={item.src} controls className="w-full h-full object-cover" />
+                                <video
+                                    src={item.src}
+                                    controls
+                                    className="w-full h-full object-cover"
+                                />
                             )}
-                            {item.type === "image" && (
-                                <div className="flex flex-col w-full h-full">
-                                    <div className="relative w-full h-full flex flex-col" onClick={() => onImageClick?.(item.src)}>
-                                        <Image src={item.src} alt={item.name} fill sizes="70vw" className="cursor-pointer object-cover" />
 
-                                    </div>
-                                    <p>Clique na imagem para ver mais detalhes</p>
+                            {item.type === "image" && (
+                                <div className="relative w-full h-full" onClick={() => onImageClick?.(item.src)}>
+                                    <Image
+                                        src={item.src}
+                                        alt={item.name}
+                                        fill
+                                        className="cursor-pointer object-cover"
+                                    />
                                 </div>
                             )}
                         </div>

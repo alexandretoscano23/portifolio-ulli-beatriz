@@ -59,6 +59,10 @@ body {
 /*Responsivo*/
 @media (max-width: 1280px) {
 
+    h1 {
+        font-size: 2rem;
+    }
+
     /*Containers*/
     .container-contact {
         flex-direction: column;
@@ -85,10 +89,24 @@ body {
     .image_contact {
         width: 60vw;
     }
+}
 
-    .title-about {
-        font-size: 2rem;
+@media (max-width: 760px) {
+
+    h1 {
+        font-size: 1.6rem;
     }
 
+    #container-icons {
+        margin-bottom: 1rem;
+    }
 
+    #insta-icon,
+    #gmail-icon {
+        width: 18px;
+    }
+
+    #text-about {
+        margin-bottom: 1rem;
+    }
 }

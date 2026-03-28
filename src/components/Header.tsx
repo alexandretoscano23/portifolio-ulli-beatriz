@@ -1,10 +1,23 @@
 'use client'
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
 
 export const Header = () => {
 
     const [isMenuClick, setIsMenuClick] = useState(false);
+    const menuRef = useRef<HTMLElement>(null);
+
+    useEffect(() => {
+        if (!menuRef) return
+
+        if (isMenuClick) {
+            gsap.fromTo(menuRef.current,
+                { opacity: 0, y: -10 },
+                { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }
+            )
+        }
+    }, [isMenuClick])
 
     const handleClick = () => {
         setIsMenuClick(!isMenuClick); //se clicar vira true e ao clicar de novo vira false (alterna)
@@ -21,7 +34,7 @@ export const Header = () => {
     ]
     return (
         <>
-            <header className="px-6 md:px-16 mt-[1rem]">
+            <header className="px-6 md:px-16 mt-[1rem] px-4 py-6 mb-[.8rem] mt-[.6rem]" style={{ background: "var(--color1)" }}>
                 {/* Linha 1: título + botão */}
                 <div className="flex items-center justify-between w-full">
                     <div className="flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-3">
@@ -37,7 +50,7 @@ export const Header = () => {
                         </ul>
                     </nav>
 
-                    <button className="md:hidden bg-[var(--color3)] text-[1.5rem] px-3 py-2" style={{ background: "#fff", borderRadius: "50%" }} onClick={handleClick}>
+                    <button className="md:hidden bg-[var(--color3)] text-[1.5rem] px-4 py-2" style={{ background: "var(--color1)", borderRadius: "50%" }} onClick={handleClick}>
                         {isMenuClick ? "X" : "☰"}
 
                     </button>
@@ -45,10 +58,15 @@ export const Header = () => {
 
                 {/* Linha 2: menu mobile */}
                 {isMenuClick && (
-                    <nav className="md:hidden mt-4" style={{}}>
-                        <ul className="flex flex-col gap-3 px-4 py-2 " style={{ background: "#B0365E", borderRadius: "16px" }}>
+                    <nav
+                        ref={menuRef}
+                        className={`md:hidden mt-4 ${isMenuClick ? "block" : "hidden"}`}
+                    >
+                        <ul className="flex flex-col gap-3 px-4 py-2" style={{ background: "#B0365E", borderRadius: "16px" }}>
                             {navLinks.map((item) => (
-                                <li key={item.href}><a style={{ color: "var(--color1)" }} href={item.href}>{item.name}</a></li>
+                                <li key={item.href}>
+                                    <a style={{ color: "var(--color1)" }} href={item.href}>{item.name}</a>
+                                </li>
                             ))}
                         </ul>
                     </nav>
