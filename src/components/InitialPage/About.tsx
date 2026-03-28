@@ -16,7 +16,7 @@ export const About = () => {
                 <div className="container-text_about">
                     <DivLine />
                     <h1 id="title-about" className="text-[2.5rem]">Sobre Mim</h1>
-                    <h3 className="italic destaque subtitle-about" style={{ fontFamily: 'var(--font-citation)' }}>"Histórias que emocionam, vídeos que conectam."</h3>
+                    <h3 className="italic destaque subtitle-about" style={{ fontFamily: 'var(--font-citation)' }}>"Entrega rápida é comum. Entrega Rápida e Bem-feita é diferente. " <span className="text-[.8rem]">- ulli beatriz</span></h3>
 
                     <p id="text-about" className="max-w-[550px] leading-7 mt-[1.2rem]">
                         Meu nome é Ulli Beatriz, tenho 23 anos, sou publicitária formada pela Uniesp e apaixonada por contar histórias que emocionam.
