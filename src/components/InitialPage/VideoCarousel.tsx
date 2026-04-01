@@ -64,6 +64,7 @@ export default function MediaCarousel({ items, title, subtitle, onImageClick }: 
                                 <video
                                     src={item.src}
                                     controls
+                                    preload="metadata"
                                     className="w-full h-full object-cover"
                                 />
                             )}
