@@ -4,4 +4,5 @@ export type Video = {
     name: string;
     category: string;
     type: "video" | "image";
+    poster?: string;
 }

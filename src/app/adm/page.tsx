@@ -7,6 +7,34 @@ import { Video } from "@/types/video"
 type Category = "videomaker" | "storymaker"
 type MediaType = "video" | "image"
 
+const generateThumbnail = (file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+        const video = document.createElement("video")
+        video.preload = "metadata"
+        video.muted = true
+        video.playsInline = true
+
+        video.onloadeddata = () => {
+            video.currentTime = 1
+        }
+
+        video.onseeked = () => {
+            const canvas = document.createElement("canvas")
+            canvas.width = video.videoWidth
+            canvas.height = video.videoHeight
+            canvas.getContext("2d")?.drawImage(video, 0, 0)
+            canvas.toBlob((blob) => {
+                if (!blob) return reject("Erro ao gerar thumbnail")
+                const thumbFile = new File([blob], "thumbnail.jpg", { type: "image/jpeg" })
+                resolve(thumbFile)
+            }, "image/jpeg", 0.8)
+        }
+
+        video.onerror = reject
+        video.src = URL.createObjectURL(file)
+    })
+}
+
 export default function PageAdmin() {
     const [category, setCategory] = useState<Category>("videomaker")
     const [type, setType] = useState<MediaType>("video")
@@ -35,6 +63,12 @@ export default function PageAdmin() {
 
         const path = item.src.split("/storage/v1/object/public/media/")[1]
         await supabase.storage.from("media").remove([path])
+
+        if (item.poster) {
+            const posterPath = item.poster.split("/storage/v1/object/public/media/")[1]
+            await supabase.storage.from("media").remove([posterPath])
+        }
+
         await supabase.from("videos").delete().eq("id", item.id)
         fetchMedia()
     }
@@ -61,9 +95,27 @@ export default function PageAdmin() {
 
             const src = urlData.publicUrl
 
+            let posterUrl = ""
+
+            if (type === "video") {
+                const thumbFile = await generateThumbnail(file)
+                const thumbName = `${category}/thumb_${Date.now()}.jpg`
+
+                const { error: thumbError } = await supabase.storage
+                    .from("media")
+                    .upload(thumbName, thumbFile)
+
+                if (!thumbError) {
+                    const { data: thumbUrlData } = supabase.storage
+                        .from("media")
+                        .getPublicUrl(thumbName)
+                    posterUrl = thumbUrlData.publicUrl
+                }
+            }
+
             const { error: dbError } = await supabase
                 .from("videos")
-                .insert({ src, name, category, type })
+                .insert({ src, name, category, type, poster: posterUrl || null })
 
             if (dbError) throw dbError
 
@@ -80,7 +132,6 @@ export default function PageAdmin() {
         }
     }
 
-    // Contagem de nomes
     const nameCount: Record<string, number> = {}
     const nameIndex: Record<string, number> = {}
 
@@ -91,7 +142,6 @@ export default function PageAdmin() {
     return (
         <div className="min-h-screen flex flex-col items-center bg-[#f9f9f7] py-10 px-6 gap-8">
 
-            {/* Formulário de upload */}
             <div className="bg-white rounded-2xl shadow-sm p-8 w-full max-w-md flex flex-col gap-6">
                 <h1 className="text-xl font-semibold">Publicar Conteúdo</h1>
 
@@ -171,7 +221,6 @@ export default function PageAdmin() {
                 )}
             </div>
 
-            {/* Lista de mídias publicadas */}
             <div className="bg-white rounded-2xl shadow-sm p-8 w-full max-w-md flex flex-col gap-4">
                 <h2 className="text-lg font-semibold">Conteúdo Publicado</h2>
 
