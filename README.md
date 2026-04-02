@@ -2,6 +2,9 @@
 
 Este é o projeto oficial do portfólio da **Ulli Beatriz**, desenvolvido para apresentar seus trabalhos em produção audiovisual e criação de conteúdo estratégico para stories. O foco principal é a entrega de uma interface de alto nível estético, unindo design minimalista de luxo com performance técnica superior.
 
+### Link do portfolio :
+https://portfolio-ulli-beatriz.vercel.app/
+
 ## 🛠️ Tecnologias Utilizadas
 
 - **Framework:** [Next.js 14+](https://nextjs.org/) (App Router)
