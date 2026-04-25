@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase"
 import { Video } from "@/types/video"
 
 export const useMedia = (category: "videomaker" | "storymaker") => {
@@ -8,17 +7,15 @@ export const useMedia = (category: "videomaker" | "storymaker") => {
 
     useEffect(() => {
         const fetchMedia = async () => {
-            const { data, error } = await supabase
-                .from("videos")
-                .select("*")
-                .eq("category", category)
-                .order("created_at", { ascending: false })
-
-            if (!error && data) {
+            try {
+                const res = await fetch(`/api/videos?category=${category}`)
+                const data = await res.json()
                 setItems(data as Video[])
+            } catch (error) {
+                console.error("Erro ao buscar mídia:", error)
+            } finally {
+                setLoading(false)
             }
-
-            setLoading(false)
         }
 
         fetchMedia()

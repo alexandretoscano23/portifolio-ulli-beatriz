@@ -1,38 +1,41 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { supabase } from "@/lib/supabase"
 import { Video } from "@/types/video"
 
 type Category = "videomaker" | "storymaker"
 type MediaType = "video" | "image"
 
-const generateThumbnail = (file: File): Promise<File> => {
-    return new Promise((resolve, reject) => {
-        const video = document.createElement("video")
-        video.preload = "metadata"
-        video.muted = true
-        video.playsInline = true
+const uploadToCloudinary = async (file: File, category: string): Promise<{ url: string; poster?: string }> => {
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!
+    const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!
 
-        video.onloadeddata = () => {
-            video.currentTime = 1
-        }
+    const isVideo = file.type.startsWith("video/")
+    const resourceType = isVideo ? "video" : "image"
 
-        video.onseeked = () => {
-            const canvas = document.createElement("canvas")
-            canvas.width = video.videoWidth
-            canvas.height = video.videoHeight
-            canvas.getContext("2d")?.drawImage(video, 0, 0)
-            canvas.toBlob((blob) => {
-                if (!blob) return reject("Erro ao gerar thumbnail")
-                const thumbFile = new File([blob], "thumbnail.jpg", { type: "image/jpeg" })
-                resolve(thumbFile)
-            }, "image/jpeg", 0.8)
-        }
+    const formData = new FormData()
+    formData.append("file", file)
+    formData.append("upload_preset", uploadPreset)
+    formData.append("folder", `ulli/${category}`)
 
-        video.onerror = reject
-        video.src = URL.createObjectURL(file)
-    })
+    const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
+        { method: "POST", body: formData }
+    )
+
+    if (!res.ok) throw new Error("Erro no upload para Cloudinary")
+
+    const data = await res.json()
+    const url = data.secure_url
+
+    let poster: string | undefined
+    if (isVideo) {
+        poster = url
+            .replace("/video/upload/", "/video/upload/so_1,f_jpg/")
+            .replace(/\.[^/.]+$/, ".jpg")
+    }
+
+    return { url, poster }
 }
 
 export default function PageAdmin() {
@@ -45,12 +48,9 @@ export default function PageAdmin() {
     const [mediaList, setMediaList] = useState<Video[]>([])
 
     const fetchMedia = async () => {
-        const { data, error } = await supabase
-            .from("videos")
-            .select("*")
-            .order("created_at", { ascending: false })
-
-        if (!error && data) setMediaList(data as Video[])
+        const res = await fetch("/api/videos")
+        const data = await res.json()
+        setMediaList(data as Video[])
     }
 
     useEffect(() => {
@@ -61,15 +61,7 @@ export default function PageAdmin() {
         const confirmed = confirm(`Deletar "${item.name}"?`)
         if (!confirmed) return
 
-        const path = item.src.split("/storage/v1/object/public/media/")[1]
-        await supabase.storage.from("media").remove([path])
-
-        if (item.poster) {
-            const posterPath = item.poster.split("/storage/v1/object/public/media/")[1]
-            await supabase.storage.from("media").remove([posterPath])
-        }
-
-        await supabase.from("videos").delete().eq("id", item.id)
+        await fetch(`/api/videos?id=${item.id}`, { method: "DELETE" })
         fetchMedia()
     }
 
@@ -80,50 +72,20 @@ export default function PageAdmin() {
         setSuccess(false)
 
         try {
-            const fileExt = file.name.split(".").pop()
-            const fileName = `${category}/${Date.now()}.${fileExt}`
+            const { url: src, poster } = await uploadToCloudinary(file, category)
 
-            const { error: uploadError } = await supabase.storage
-                .from("media")
-                .upload(fileName, file)
+            const res = await fetch("/api/videos", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ src, name, category, type, poster: poster ?? null }),
+            })
 
-            if (uploadError) throw uploadError
-
-            const { data: urlData } = supabase.storage
-                .from("media")
-                .getPublicUrl(fileName)
-
-            const src = urlData.publicUrl
-
-            let posterUrl = ""
-
-            if (type === "video") {
-                const thumbFile = await generateThumbnail(file)
-                const thumbName = `${category}/thumb_${Date.now()}.jpg`
-
-                const { error: thumbError } = await supabase.storage
-                    .from("media")
-                    .upload(thumbName, thumbFile)
-
-                if (!thumbError) {
-                    const { data: thumbUrlData } = supabase.storage
-                        .from("media")
-                        .getPublicUrl(thumbName)
-                    posterUrl = thumbUrlData.publicUrl
-                }
-            }
-
-            const { error: dbError } = await supabase
-                .from("videos")
-                .insert({ src, name, category, type, poster: posterUrl || null })
-
-            if (dbError) throw dbError
+            if (!res.ok) throw new Error("Erro ao salvar no banco")
 
             setSuccess(true)
             setName("")
             setFile(null)
             fetchMedia()
-
         } catch (err) {
             console.error(err)
             alert("Erro ao publicar. Tente novamente.")
@@ -134,14 +96,12 @@ export default function PageAdmin() {
 
     const nameCount: Record<string, number> = {}
     const nameIndex: Record<string, number> = {}
-
     mediaList.forEach((item) => {
         nameCount[item.name] = (nameCount[item.name] || 0) + 1
     })
 
     return (
         <div className="min-h-screen flex flex-col items-center bg-[#f9f9f7] py-10 px-6 gap-8">
-
             <div className="bg-white rounded-2xl shadow-sm p-8 w-full max-w-md flex flex-col gap-6">
                 <h1 className="text-xl font-semibold">Publicar Conteúdo</h1>
 
@@ -150,13 +110,7 @@ export default function PageAdmin() {
                     <div className="flex gap-4">
                         {(["video", "image"] as MediaType[]).map((t) => (
                             <label key={t} className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="radio"
-                                    name="type"
-                                    value={t}
-                                    checked={type === t}
-                                    onChange={() => setType(t)}
-                                />
+                                <input type="radio" name="type" value={t} checked={type === t} onChange={() => setType(t)} />
                                 <span>{t === "video" ? "Vídeo" : "Foto"}</span>
                             </label>
                         ))}
@@ -216,14 +170,11 @@ export default function PageAdmin() {
                     {loading ? "Publicando..." : "Publicar Conteúdo"}
                 </button>
 
-                {success && (
-                    <p className="text-center text-green-600 text-sm">Publicado com sucesso!</p>
-                )}
+                {success && <p className="text-center text-green-600 text-sm">Publicado com sucesso!</p>}
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm p-8 w-full max-w-md flex flex-col gap-4">
                 <h2 className="text-lg font-semibold">Conteúdo Publicado</h2>
-
                 {mediaList.length === 0 ? (
                     <p className="text-sm text-gray-400">Nenhum conteúdo publicado ainda.</p>
                 ) : (
@@ -250,7 +201,6 @@ export default function PageAdmin() {
                     })
                 )}
             </div>
-
         </div>
     )
 }
