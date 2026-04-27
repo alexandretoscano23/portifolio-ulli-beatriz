@@ -62,13 +62,15 @@ export default function MediaCarousel({ items, title, subtitle, onImageClick }: 
                         >
                             {item.type === "video" && (
                                 <video
-                                    src={item.src}
                                     controls
                                     playsInline
-                                    preload="metadata"
-                                    poster={item.poster}
+                                    preload="auto"
+                                    poster={item.poster ?? undefined}
                                     className="w-full h-full object-cover"
-                                />
+                                    style={{ backgroundColor: "#000" }}
+                                >
+                                    <source src={item.src} type="video/mp4" />
+                                </video>
                             )}
 
                             {item.type === "image" && (
